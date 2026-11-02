@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PES PSP Kit Config - CLI Mode</title>
+    <style>
+        :root {
+            --bg-dark: #050505;
+            --card-bg: #0a0e0a;
+            --panel-bg: #0f140f;
+            --accent: #00ff66;
+            --accent-dim: #008833;
+            --text-main: #00ff66;
+            --text-muted: #00aa44;
+            --border-color: #00ff66;
+        }
+
+        body {
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .studio-container {
+            background-color: var(--card-bg);
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0, 255, 102, 0.2);
+            width: 100%;
+            max-width: 960px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER */
+        .header {
+            background: #001100;
+            padding: 15px 20px;
+            border-bottom: 2px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .app-logo {
+            width: 38px;
+            height: 38px;
+            object-fit: contain;
+            border-radius: 0px;
+            background: #000;
+            border: 1px solid var(--border-color);
+            padding: 2px;
+        }
+
+        .header .title-group h1 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: var(--accent);
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header .title-group h1 span {
+            color: #000;
+            background: var(--accent);
+            padding: 1px 6px;
+            border-radius: 0px;
+            font-size: 11px;
+        }
+
+        .header .title-group p {
+            margin: 4px 0 0 0;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 14px;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: inherit;
+            border-radius: 0px;
+            cursor: pointer;
+            border: 1px solid var(--accent);
+            transition: all 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+        }
+
+        .btn-load { background: #000; color: var(--accent); }
+        .btn-load:hover { background: var(--accent); color: #000; }
+        .btn-save { background: var(--accent); color: #000; }
+        .btn-save:hover { background: #fff; color: #000; border-color: #fff; }
+
+        /* STATUS BANNER */
+        .status-banner {
+            background-color: #000800;
+            padding: 8px 20px;
+            font-size: 11px;
+            color: var(--text-muted);
+            border-bottom: 1px dashed var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #ff0000;
+        }
+
+        .status-dot.active {
+            background-color: var(--accent);
+            box-shadow: 0 0 6px var(--accent);
+        }
+
+        /* DASHBOARD GRID */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 15px;
+            padding: 20px;
+        }
+
+        @media (max-width: 820px) {
+            .dashboard { grid-template-columns: 1fr; }
+        }
+
+        /* PANEL KIRI: SELECTORS */
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0px;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .panel-title {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            border-bottom: 1px dashed var(--accent-dim);
+            padding-bottom: 4px;
+            margin-bottom: 2px;
+        }
+
+        label {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--text-muted);
+            display: block;
+            margin-bottom: 3px;
+        }
+
+        select {
+            width: 100%;
+            padding: 7px 8px;
+            background: #000;
+            color: var(--accent);
+            border: 1px solid var(--border-color);
+            border-radius: 0px;
+            font-size: 11px;
+            font-family: inherit;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        select:focus {
+            background: #051505;
+        }
+
+        /* TAB NAVIGATION (PANEL KANAN) */
+        .tabs-nav {
+            display: flex;
+            gap: 4px;
+            background: #000;
+            padding: 4px;
+            border-radius: 0px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            flex: 1;
+            min-width: 90px;
+            padding: 6px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            font-family: inherit;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid transparent;
+            border-radius: 0px;
+            cursor: pointer;
+            text-align: center;
+            text-transform: uppercase;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        /* SECTION HEADERS IN TAB */
+        .section-header {
+            font-size: 11px;
+            font-weight: bold;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            border-bottom: 1px solid var(--accent-dim);
+            padding-bottom: 4px;
+            margin-bottom: 6px;
+        }
+
+        /* LAYOUT INFO BOX */
+        .layout-guide {
+            background: #000a00;
+            border: 1px dashed var(--accent-dim);
+            border-radius: 0px;
+            padding: 8px 10px;
+            font-size: 10px;
+            color: var(--text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .layout-guide strong {
+            color: var(--accent);
+        }
+
+        /* CONTROL GRID ITEMS */
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+        }
+
+        .editor-card {
+            background: #000;
+            border: 1px solid var(--border-color);
+            border-radius: 0px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .editor-card-title {
+            font-size: 9px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: bold;
+            margin-bottom: 6px;
+        }
+
+        .hex-stepper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-step {
+            background: #000;
+            color: var(--accent);
+            border: 1px solid var(--border-color);
+            width: 28px;
+            height: 28px;
+            border-radius: 0px;
+            font-size: 14px;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
+        .btn-step:hover {
+            background: var(--accent);
+            color: #000;
+        }
+
+        .hex-input-box {
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 15px;
+            font-weight: bold;
+            text-align: center;
+            width: 48px;
+            height: 28px;
+            background: #000;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 0px;
+            outline: none;
+            box-sizing: border-box;
+        }
+
+        /* DEBUG FOOTER */
+        .debug-panel {
+            background: #000;
+            border: 1px solid var(--accent-dim);
+            border-radius: 0px;
+            padding: 8px 10px;
+            font-family: monospace;
+            font-size: 10px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 4px;
+        }
+
+        .highlight { color: var(--accent); font-weight: bold; }
+
+        .disabled-area {
+            opacity: 0.25;
+            pointer-events: none;
+            filter: grayscale(1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="studio-container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-left">
+                <img src="logo.png" alt="Logo" class="app-logo" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'40\' height=\'40\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%2300ff66\' stroke-width=\'2\'><rect x=\'3\' y=\'3\' width=\'18\' height=\'18\' rx=\'0\'/><path d=\'M9 12h6\'/><path d=\'M12 9v6\'/></svg>'">
+                <div class="title-group">
+                    <h1>C:\> KIT_CONFIG <span>CLI.EXE</span></h1>
+                    <p>PES PSP Kit Attributes & Byte Inspector v1.0</p>
+                </div>
+            </div>
+            <div class="action-bar">
+                <label for="fileInput" class="btn btn-load">> OPEN.BIN</label>
+                <input type="file" id="fileInput" accept=".bin" style="display:none;" onchange="loadBinFile(event)">
+                <button class="btn btn-save" onclick="saveBinFile()">> SAVE.BIN</button>
+            </div>
+        </div>
+
+        <!-- STATUS -->
+        <div class="status-banner">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="statusText">SYSTEM_READY: Silakan muat file DATA.BIN...</span>
+        </div>
+
+        <!-- MAIN DASHBOARD -->
+        <div class="dashboard">
+            
+            <!-- PANEL KIRI: TEAM & KIT SELECTOR -->
+            <div class="panel disabled-area" id="leftPanel">
+                <div class="panel-title">[1] TEAM_SELECTOR</div>
+
+                <div>
+                    <label>Kategori Tim</label>
+                    <select id="categorySelect" onchange="updateLeagueDropdown()">
+                        <option value="">-- Pilih Kategori --</option>
+                        <option value="national">National Teams</option>
+                        <option value="club">Club Teams</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Liga / Region</label>
+                    <select id="leagueSelect" onchange="updateTeamDropdown()">
+                        <option value="">-- Pilih Kategori Dulu --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Tim Target</label>
+                    <select id="teamSelect" onchange="updateKitDropdown()">
+                        <option value="">-- Pilih Liga Dulu --</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label>Slot Kit</label>
+                    <select id="kitSelect" onchange="readOffsetData()">
+                        <option value="">-- Pilih Tim Dulu --</option>
+                        <option value="0">GK Home (+0x00)</option>
+                        <option value="88">Home (+0x58)</option>
+                        <option value="176">GK Away (+0xB0)</option>
+                        <option value="264">Away (+0x108)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- PANEL KANAN: TABBED CONTROLLER PANEL -->
+            <div class="panel disabled-area" id="rightPanel">
+                <div class="panel-title">[2] ATTRIBUTE_CONFIG</div>
+
+                <!-- TABS NAVIGATION -->
+                <div class="tabs-nav">
+                    <button class="tab-btn active" onclick="openTab(event, 'tab-jersey')">Jersey</button>
+                    <button class="tab-btn" onclick="openTab(event, 'tab-back')">Punggung</button>
+                    <button class="tab-btn" onclick="openTab(event, 'tab-chest')">Dada</button>
+                    <button class="tab-btn" onclick="openTab(event, 'tab-shorts')">Celana</button>
+                </div>
+
+                <!-- TAB 1: JERSEY -->
+                <div id="tab-jersey" class="tab-content active">
+                    <div class="section-header">Konfigurasi Kerah Jersey</div>
+                    <div class="layout-guide">
+                        <strong>LOG INFO:</strong>
+                        <span>> Nilai Hex mengatur model desain & bentuk kerah dasar.</span>
+                    </div>
+                    <div class="control-grid">
+                        <div class="editor-card">
+                            <div class="editor-card-title">Kerah (+0x52)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('collarHexInput', -1, 'collar')">-</button>
+                                <input type="text" id="collarHexInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('collar')">
+                                <button class="btn-step" onclick="stepHex('collarHexInput', 1, 'collar')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: PUNGGUNG -->
+                <div id="tab-back" class="tab-content">
+                    <div>
+                        <div class="section-header">Font Nama Pemain (Back Name)</div>
+                        <div class="control-grid" style="margin-top: 6px;">
+                            <div class="editor-card">
+                                <div class="editor-card-title">Gaya Font (+0x38)</div>
+                                <div class="hex-stepper">
+                                    <button class="btn-step" onclick="stepHex('fontStyleInput', -1, 'fontStyle')">-</button>
+                                    <input type="text" id="fontStyleInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('fontStyle')">
+                                    <button class="btn-step" onclick="stepHex('fontStyleInput', 1, 'fontStyle')">+</button>
+                                </div>
+                            </div>
+                            <div class="editor-card">
+                                <div class="editor-card-title">Posisi Y (+0x4B)</div>
+                                <div class="hex-stepper">
+                                    <button class="btn-step" onclick="stepHex('namePosYInput', -1, 'namePosY')">-</button>
+                                    <input type="text" id="namePosYInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('namePosY')">
+                                    <button class="btn-step" onclick="stepHex('namePosYInput', 1, 'namePosY')">+</button>
+                                </div>
+                            </div>
+                            <div class="editor-card">
+                                <div class="editor-card-title">Ukuran (+0x4C)</div>
+                                <div class="hex-stepper">
+                                    <button class="btn-step" onclick="stepHex('nameSizeInput', -1, 'nameSize')">-</button>
+                                    <input type="text" id="nameSizeInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('nameSize')">
+                                    <button class="btn-step" onclick="stepHex('nameSizeInput', 1, 'nameSize')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="section-header">Nomor Punggung (Back Number)</div>
+                        <div class="control-grid" style="margin-top: 6px;">
+                            <div class="editor-card">
+                                <div class="editor-card-title">Posisi Y (+0x43)</div>
+                                <div class="hex-stepper">
+                                    <button class="btn-step" onclick="stepHex('numPosYInput', -1, 'numPosY')">-</button>
+                                    <input type="text" id="numPosYInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('numPosY')">
+                                    <button class="btn-step" onclick="stepHex('numPosYInput', 1, 'numPosY')">+</button>
+                                </div>
+                            </div>
+                            <div class="editor-card">
+                                <div class="editor-card-title">Ukuran (+0x44)</div>
+                                <div class="hex-stepper">
+                                    <button class="btn-step" onclick="stepHex('numSizeInput', -1, 'numSize')">-</button>
+                                    <input type="text" id="numSizeInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('numSize')">
+                                    <button class="btn-step" onclick="stepHex('numSizeInput', 1, 'numSize')">+</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 3: DADA -->
+                <div id="tab-chest" class="tab-content">
+                    <div class="section-header">Atribut Dada (Chest Number)</div>
+                    <div class="control-grid" style="margin-top: 6px;">
+                        <div class="editor-card">
+                            <div class="editor-card-title">Switch (+0x3A)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('chestSwitchInput', -1, 'chestSwitch')">-</button>
+                                <input type="text" id="chestSwitchInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('chestSwitch')">
+                                <button class="btn-step" onclick="stepHex('chestSwitchInput', 1, 'chestSwitch')">+</button>
+                            </div>
+                        </div>
+                        <div class="editor-card">
+                            <div class="editor-card-title">Posisi Y (+0x45)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('chestPosYInput', -1, 'chestPosY')">-</button>
+                                <input type="text" id="chestPosYInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('chestPosY')">
+                                <button class="btn-step" onclick="stepHex('chestPosYInput', 1, 'chestPosY')">+</button>
+                            </div>
+                        </div>
+                        <div class="editor-card">
+                            <div class="editor-card-title">Posisi X (+0x46)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('chestPosXInput', -1, 'chestPosX')">-</button>
+                                <input type="text" id="chestPosXInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('chestPosX')">
+                                <button class="btn-step" onclick="stepHex('chestPosXInput', 1, 'chestPosX')">+</button>
+                            </div>
+                        </div>
+                        <div class="editor-card">
+                            <div class="editor-card-title">Ukuran (+0x47)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('chestSizeInput', -1, 'chestSize')">-</button>
+                                <input type="text" id="chestSizeInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('chestSize')">
+                                <button class="btn-step" onclick="stepHex('chestSizeInput', 1, 'chestSize')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 4: CELANA -->
+                <div id="tab-shorts" class="tab-content">
+                    <div class="section-header">Atribut Celana (Shorts Number)</div>
+                    <div class="control-grid" style="margin-top: 6px;">
+                        <div class="editor-card">
+                            <div class="editor-card-title">Switch (+0x3B)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('shortsSwitchInput', -1, 'shortsSwitch')">-</button>
+                                <input type="text" id="shortsSwitchInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('shortsSwitch')">
+                                <button class="btn-step" onclick="stepHex('shortsSwitchInput', 1, 'shortsSwitch')">+</button>
+                            </div>
+                        </div>
+                        <div class="editor-card">
+                            <div class="editor-card-title">Posisi Y (+0x48)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('shortsPosYInput', -1, 'shortsPosY')">-</button>
+                                <input type="text" id="shortsPosYInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('shortsPosY')">
+                                <button class="btn-step" onclick="stepHex('shortsPosYInput', 1, 'shortsPosY')">+</button>
+                            </div>
+                        </div>
+                        <div class="editor-card">
+                            <div class="editor-card-title">Posisi X (+0x49)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('shortsPosXInput', -1, 'shortsPosX')">-</button>
+                                <input type="text" id="shortsPosXInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('shortsPosX')">
+                                <button class="btn-step" onclick="stepHex('shortsPosXInput', 1, 'shortsPosX')">+</button>
+                            </div>
+                        </div>
+                        <div class="editor-card">
+                            <div class="editor-card-title">Ukuran (+0x4A)</div>
+                            <div class="hex-stepper">
+                                <button class="btn-step" onclick="stepHex('shortsSizeInput', -1, 'shortsSize')">-</button>
+                                <input type="text" id="shortsSizeInput" class="hex-input-box" maxlength="2" placeholder="00" oninput="onHexInputChange('shortsSize')">
+                                <button class="btn-step" onclick="stepHex('shortsSizeInput', 1, 'shortsSize')">+</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DEBUG CONSOLE -->
+                <div class="debug-panel" id="debugInfo">
+                    <div>TEAM_BASE : <span class="highlight">-</span></div>
+                    <div>KIT_OFFSET: <span class="highlight">-</span></div>
+                    <div>STATUS    : <span class="highlight">IDLE</span></div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let binFileData = null;
+        let binFilePath = null;
+        let binFileName = "DATA.BIN";
+
+        let offsets = {
+            collar: null, fontStyle: null, namePosY: null, nameSize: null,
+            numPosY: null, numSize: null, chestSwitch: null, chestPosY: null,
+            chestPosX: null, chestSize: null, shortsSwitch: null, shortsPosY: null,
+            shortsPosX: null, shortsSize: null
+        };
+
+        const teamDatabase = {
+            national: {
+                "UEFA A": [
+                    { name: "Austria", start: 0xB5F78 }, { name: "Belgium", start: 0xB6140 },
+                    { name: "Finland", start: 0xB6308 }, { name: "Croatia", start: 0xB64D0 },
+                    { name: "Czech", start: 0xB6698 }, { name: "Denmark", start: 0xB6860 },
+                    { name: "England", start: 0xB6A28 }, { name: "Iceland", start: 0xB6BF0 },
+                    { name: "France", start: 0xB6DB8 }, { name: "Germany", start: 0xB6F80 },
+                    { name: "Greece", start: 0xB7148 }, { name: "Bosnia", start: 0xB7310 },
+                    { name: "Ireland", start: 0xB74D8 }, { name: "Macedonia", start: 0xB76A0 },
+                    { name: "Italy", start: 0xB7868 }, { name: "Netherlands", start: 0xB7A30 },
+                    { name: "Northern Ireland", start: 0xB7BF8 }, { name: "Norway", start: 0xB7DC0 },
+                    { name: "Poland", start: 0xB7F88 }, { name: "Portugal", start: 0xB8150 }
+                ],
+                "UEFA B": [
+                    { name: "Romania", start: 0xB8318 }, { name: "Russia", start: 0xB84E0 },
+                    { name: "Scotland", start: 0xB86A8 }, { name: "Serbia", start: 0xB8870 },
+                    { name: "Slovakia", start: 0xB8A38 }, { name: "Slovenia", start: 0xB8C00 },
+                    { name: "Spain", start: 0xB8DC8 }, { name: "Sweden", start: 0xB8F90 },
+                    { name: "Swiss", start: 0xB9158 }, { name: "Turkey", start: 0xB9320 },
+                    { name: "Ukraine", start: 0xB94E8 }, { name: "Wales", start: 0xB96B0 }
+                ],
+                "Classics": [
+                    { name: "England Classic", start: 0xBCA58 }, { name: "France Classic", start: 0xBCC20 },
+                    { name: "Germany Classic", start: 0xBCDE8 }, { name: "Italy Classic", start: 0xBCFB0 },
+                    { name: "Netherlands Classic", start: 0xBD178 }, { name: "Argentina Classic", start: 0xBD340 },
+                    { name: "Brazil Classic", start: 0xBD508 }
+                ],
+                "CAF A": [
+                    { name: "Morocco", start: 0xB9878 }, { name: "Cameroon", start: 0xB9A40 },
+                    { name: "Ivory Coast", start: 0xB9C08 }, { name: "Egypt", start: 0xB9DD0 },
+                    { name: "Ghana", start: 0xB9F98 }, { name: "Nigeria", start: 0xBA160 },
+                    { name: "Algeria", start: 0xBA328 }, { name: "Senegal", start: 0xBA4F0 }
+                ],
+                "CONCACAF & CONMEBOL": [
+                    { name: "Costa Rica", start: 0xBA6B8 }, { name: "Canada", start: 0xBA880 },
+                    { name: "Mexico", start: 0xBAA48 }, { name: "USA", start: 0xBAC10 },
+                    { name: "Argentina", start: 0xBADD8 }, { name: "Brazil", start: 0xBAFA0 },
+                    { name: "Chile", start: 0xBB168 }, { name: "Colombia", start: 0xBB330 },
+                    { name: "Ecuador", start: 0xBB4F8 }, { name: "Paraguay", start: 0xBB6C0 },
+                    { name: "Peru", start: 0xBB888 }, { name: "Uruguay", start: 0xBBA50 }
+                ],
+                "AFC A": [
+                    { name: "Australia", start: 0xBBC18 }, { name: "China", start: 0xBBDE0 },
+                    { name: "Japan", start: 0xBBFA8 }, { name: "Indonesia", start: 0xBC170 },
+                    { name: "Saudi Arabia", start: 0xBC338 }, { name: "Korea Republic", start: 0xBC500 },
+                    { name: "IR Iran", start: 0xBC6C8 }, { name: "Qatar", start: 0xBC890 }
+                ]
+            },
+            club: {
+                "Premier League": [
+                    { name: "Arsenal", start: 0xBD6D0 }, { name: "Nottingham", start: 0xBD958 },
+                    { name: "Fulham", start: 0xBDBE0 }, { name: "Chelsea", start: 0xBDE68 },
+                    { name: "Crystal Palace", start: 0xBE0F0 }, { name: "Everton", start: 0xBE378 },
+                    { name: "Leicester", start: 0xBE600 }, { name: "Brentford", start: 0xBE888 },
+                    { name: "Liverpool", start: 0xBEB10 }, { name: "Manchester City", start: 0xBED98 },
+                    { name: "Manchester United", start: 0xBF020 }, { name: "Newcastle United", start: 0xBF2A8 },
+                    { name: "Bournemouth", start: 0xBF530 }, { name: "Southampton", start: 0xBF7B8 },
+                    { name: "Aston Villa", start: 0xBFA40 }, { name: "Brighton", start: 0xBFCC8 },
+                    { name: "Leeds United", start: 0xBFF50 }, { name: "Tottenham", start: 0xC01D8 },
+                    { name: "Wolves", start: 0xC0460 }, { name: "West Ham", start: 0xC06E8 }
+                ],
+                "Ligue 1": [
+                    { name: "Auxerre", start: 0xC0970 }, { name: "Lens", start: 0xC0BF8 },
+                    { name: "Toulouse", start: 0xC0E80 }, { name: "Troyes", start: 0xC1108 },
+                    { name: "Stade Brestois", start: 0xC1390 }, { name: "Losc Lille", start: 0xC1618 },
+                    { name: "Clermont", start: 0xC18A0 }, { name: "Marseille", start: 0xC1B28 },
+                    { name: "Lyon", start: 0xC1DB0 }, { name: "Stade Rennais", start: 0xC2038 },
+                    { name: "Montpellier", start: 0xC22C0 }, { name: "Nantes", start: 0xC2548 },
+                    { name: "Ogc Nice", start: 0xC27D0 }, { name: "Paris SG", start: 0xC2A58 },
+                    { name: "Stade de Reims", start: 0xC2CE0 }, { name: "AS Monaco", start: 0xC2F68 },
+                    { name: "Ajaccio", start: 0xC31F0 }, { name: "Angers SCO", start: 0xC3478 },
+                    { name: "Lorient", start: 0xC3700 }, { name: "Strasbourg", start: 0xC3988 }
+                ],
+                "Serie A": [
+                    { name: "Atalanta", start: 0xC3C10 }, { name: "Bologna", start: 0xC3E98 },
+                    { name: "Monza", start: 0xC4120 }, { name: "Cremonese", start: 0xC43A8 },
+                    { name: "Salernitana", start: 0xC4630 }, { name: "Fiorentina", start: 0xC48B8 },
+                    { name: "Lecce", start: 0xC4B40 }, { name: "Inter", start: 0xC4DC8 },
+                    { name: "Juventus", start: 0xC5050 }, { name: "Lazio", start: 0xC52D8 },
+                    { name: "Hellas Verona", start: 0xC5560 }, { name: "AC Milan", start: 0xC57E8 },
+                    { name: "Napoli", start: 0xC5A70 }, { name: "Spezia", start: 0xC5CF8 },
+                    { name: "AS Roma", start: 0xC5F80 }, { name: "Sampdoria", start: 0xC6208 },
+                    { name: "Sassuolo", start: 0xC6490 }, { name: "Empoli", start: 0xC6718 },
+                    { name: "Udinese", start: 0xC69A0 }
+                ],
+                "Bundesliga": [
+                    { name: "Augsburg", start: 0xC6EB0 }, { name: "Leverkusen", start: 0xC7138 },
+                    { name: "Bayern Munich", start: 0xC73C0 }, { name: "Borussia Dortmund", start: 0xC7648 },
+                    { name: "Monchengladbach", start: 0xC78D0 }, { name: "Schalke 04", start: 0xC7B58 },
+                    { name: "Frankfurt", start: 0xC7DE0 }, { name: "Freiburg", start: 0xC8068 },
+                    { name: "Stuttgart", start: 0xC82F0 }, { name: "Hertha Berlin", start: 0xC8578 },
+                    { name: "Leipzig", start: 0xC8800 }, { name: "Bochum", start: 0xC8A88 },
+                    { name: "Koln", start: 0xC8D10 }, { name: "Union Berlin", start: 0xC8F98 },
+                    { name: "Mainz 05", start: 0xC9220 }, { name: "Hoffenheim", start: 0xC94A8 },
+                    { name: "Werder Bremen", start: 0xC9730 }, { name: "Wolfsburg", start: 0xC99B8 }
+                ],
+                "LaLiga": [
+                    { name: "Almeria", start: 0xC9C40 }, { name: "Bilbao", start: 0xC9EC8 },
+                    { name: "Atletico Madrid", start: 0xCA150 }, { name: "FC Barcelona", start: 0xCA3D8 },
+                    { name: "Mallorca", start: 0xCA660 }, { name: "Celta Vigo", start: 0xCA8E8 },
+                    { name: "Real Betis", start: 0xCAB70 }, { name: "Cadiz", start: 0xCADF8 },
+                    { name: "Osasuna", start: 0xCB080 }, { name: "Girona", start: 0xCB308 },
+                    { name: "Elche", start: 0xCB590 }, { name: "Rayo Vallecano", start: 0xCB818 },
+                    { name: "Real Valladolid", start: 0xCBAA0 }, { name: "Getafe", start: 0xCBD28 },
+                    { name: "Real Madrid", start: 0xCBFB0 }, { name: "Real Sociedad", start: 0xCC238 },
+                    { name: "Valencia", start: 0xCC4C0 }, { name: "Sevilla", start: 0xCC748 },
+                    { name: "Espanyol", start: 0xCC9D0 }, { name: "Villarreal", start: 0xCCC58 }
+                ],
+                "Others A": [
+                    { name: "Anderlecht", start: 0xCCEE0 }, { name: "Club Brugge", start: 0xCD168 },
+                    { name: "Krasnodar", start: 0xCD3F0 }, { name: "Besiktas", start: 0xCD678 },
+                    { name: "Lokomotif Moskow", start: 0xCD900 }, { name: "Ajax Amsterdam", start: 0xCDB88 },
+                    { name: "Sheriff", start: 0xCDE10 }, { name: "Salzburg", start: 0xCE098 },
+                    { name: "Benfica", start: 0xCE320 }, { name: "Feyenoord", start: 0xCE5A8 },
+                    { name: "PSV", start: 0xCE830 }, { name: "Sporting Lisbon", start: 0xCEAB8 },
+                    { name: "Olympiacos", start: 0xCED40 }, { name: "Midtjylland", start: 0xCEFC8 },
+                    { name: "Basaksehir", start: 0xCF250 }, { name: "Porto", start: 0xCF4D8 },
+                    { name: "Zenit", start: 0xCF760 }, { name: "CSKA", start: 0xCF9E8 },
+                    { name: "Celtic", start: 0xCFC70 }, { name: "Rangers", start: 0xCFEF8 }
+                ],
+                "Others B": [
+                    { name: "Galatasaray", start: 0xD0180 }, { name: "Shaktar Donetsk", start: 0xD0408 },
+                    { name: "Basel", start: 0xD0690 }, { name: "Fenerbahce", start: 0xD0918 },
+                    { name: "Dinamo Kiev", start: 0xD0BA0 }, { name: "Parma", start: 0xD0E28 },
+                    { name: "Malmo", start: 0xD10B0 }, { name: "Young Boys", start: 0xD1338 },
+                    { name: "Paris FC", start: 0xD15C0 }, { name: "Inter Miami", start: 0xD1848 },
+                    { name: "eFOOTBALL", start: 0xD1AD0 }, { name: "Vasco Da Gama", start: 0xD1D58 }
+                ]
+            }
+        };
+
+        function openTab(evt, tabName) {
+            let tabcontent = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < tabcontent.length; i++) tabcontent[i].classList.remove("active");
+            let tablinks = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < tablinks.length; i++) tablinks[i].classList.remove("active");
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        function loadBinFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            binFileName = file.name;
+            binFilePath = file.path;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                binFileData = new Uint8Array(e.target.result);
+                document.getElementById('statusText').innerText = `LOADED: ${file.name} [${binFileData.length.toLocaleString()} BYTES]`;
+                document.getElementById('statusDot').classList.add('active');
+                document.getElementById('leftPanel').classList.remove('disabled-area');
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateLeagueDropdown() {
+            const cat = document.getElementById('categorySelect').value;
+            const leagueSelect = document.getElementById('leagueSelect');
+            const teamSelect = document.getElementById('teamSelect');
+
+            leagueSelect.innerHTML = '<option value="">-- Pilih Liga / Region --</option>';
+            teamSelect.innerHTML = '<option value="">-- Pilih Kategori Dulu --</option>';
+
+            if (cat && teamDatabase[cat]) {
+                Object.keys(teamDatabase[cat]).forEach(league => {
+                    const opt = document.createElement('option');
+                    opt.value = league;
+                    opt.textContent = league;
+                    leagueSelect.appendChild(opt);
+                });
+            }
+            resetRightPanel();
+        }
+
+        function updateTeamDropdown() {
+            const cat = document.getElementById('categorySelect').value;
+            const league = document.getElementById('leagueSelect').value;
+            const teamSelect = document.getElementById('teamSelect');
+
+            teamSelect.innerHTML = '<option value="">-- Pilih Tim --</option>';
+
+            if (cat && league && teamDatabase[cat][league]) {
+                teamDatabase[cat][league].forEach((team, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.textContent = team.name;
+                    teamSelect.appendChild(opt);
+                });
+            }
+            resetRightPanel();
+        }
+
+        function updateKitDropdown() {
+            document.getElementById('kitSelect').selectedIndex = 0;
+            resetRightPanel();
+        }
+
+        function resetRightPanel() {
+            document.getElementById('rightPanel').classList.add('disabled-area');
+            Object.keys(offsets).forEach(k => {
+                offsets[k] = null;
+                const inputEl = document.getElementById(k + 'Input') || document.getElementById(k + 'HexInput');
+                if (inputEl) inputEl.value = '';
+            });
+
+            document.getElementById('debugInfo').innerHTML = `
+                <div>TEAM_BASE : <span class="highlight">-</span></div>
+                <div>KIT_OFFSET: <span class="highlight">-</span></div>
+                <div>STATUS    : <span class="highlight">STANDBY</span></div>
+            `;
+        }
+
+        function readOffsetData() {
+            const cat = document.getElementById('categorySelect').value;
+            const league = document.getElementById('leagueSelect').value;
+            const teamIndex = document.getElementById('teamSelect').value;
+            const kitOffsetStr = document.getElementById('kitSelect').value;
+
+            if (!binFileData || !cat || !league || teamIndex === "" || kitOffsetStr === "") return;
+
+            const selectedTeam = teamDatabase[cat][league][teamIndex];
+            const kitOffsetDec = parseInt(kitOffsetStr); 
+            const kitStartOffset = selectedTeam.start + kitOffsetDec;
+
+            offsets.collar = kitStartOffset + 82;
+            offsets.fontStyle = kitStartOffset + 56;
+            offsets.namePosY = kitStartOffset + 75;
+            offsets.nameSize = kitStartOffset + 76;
+            offsets.numPosY = kitStartOffset + 67;
+            offsets.numSize = kitStartOffset + 68;
+            offsets.chestSwitch = kitStartOffset + 58;
+            offsets.chestPosY = kitStartOffset + 69;
+            offsets.chestPosX = kitStartOffset + 70;
+            offsets.chestSize = kitStartOffset + 71;
+            offsets.shortsSwitch = kitStartOffset + 59;
+            offsets.shortsPosY = kitStartOffset + 72;
+            offsets.shortsPosX = kitStartOffset + 73;
+            offsets.shortsSize = kitStartOffset + 74;
+
+            setHexValueToInput('collarHexInput', offsets.collar);
+            setHexValueToInput('fontStyleInput', offsets.fontStyle);
+            setHexValueToInput('namePosYInput', offsets.namePosY);
+            setHexValueToInput('nameSizeInput', offsets.nameSize);
+            setHexValueToInput('numPosYInput', offsets.numPosY);
+            setHexValueToInput('numSizeInput', offsets.numSize);
+            setHexValueToInput('chestSwitchInput', offsets.chestSwitch);
+            setHexValueToInput('chestPosYInput', offsets.chestPosY);
+            setHexValueToInput('chestPosXInput', offsets.chestPosX);
+            setHexValueToInput('chestSizeInput', offsets.chestSize);
+            setHexValueToInput('shortsSwitchInput', offsets.shortsSwitch);
+            setHexValueToInput('shortsPosYInput', offsets.shortsPosY);
+            setHexValueToInput('shortsPosXInput', offsets.shortsPosX);
+            setHexValueToInput('shortsSizeInput', offsets.shortsSize);
+
+            document.getElementById('rightPanel').classList.remove('disabled-area');
+
+            document.getElementById('debugInfo').innerHTML = `
+                <div>TEAM_BASE : <span class="highlight">0x${selectedTeam.start.toString(16).toUpperCase()}</span></div>
+                <div>KIT_OFFSET: <span class="highlight">+0x${kitOffsetDec.toString(16).toUpperCase()}</span></div>
+                <div>STATUS    : <span class="highlight">READY</span></div>
+            `;
+        }
+
+        function setHexValueToInput(inputId, targetOffset) {
+            if (targetOffset !== null && targetOffset < binFileData.length) {
+                const decVal = binFileData[targetOffset];
+                const el = document.getElementById(inputId);
+                if(el) el.value = decVal.toString(16).padStart(2, '0').toUpperCase();
+            }
+        }
+
+        function onHexInputChange(type) {
+            if (!binFileData) return;
+            const inputMap = {
+                collar: 'collarHexInput', fontStyle: 'fontStyleInput', namePosY: 'namePosYInput',
+                nameSize: 'nameSizeInput', numPosY: 'numPosYInput', numSize: 'numSizeInput',
+                chestSwitch: 'chestSwitchInput', chestPosY: 'chestPosYInput', chestPosX: 'chestPosXInput',
+                chestSize: 'chestSizeInput', shortsSwitch: 'shortsSwitchInput', shortsPosY: 'shortsPosYInput',
+                shortsPosX: 'shortsPosXInput', shortsSize: 'shortsSizeInput'
+            };
+
+            let inputId = inputMap[type];
+            let targetOffset = offsets[type];
+            if (targetOffset === null || !inputId) return;
+
+            let hexVal = document.getElementById(inputId).value.toUpperCase().replace(/[^0-9A-F]/g, '');
+            document.getElementById(inputId).value = hexVal;
+
+            if (hexVal.length === 2) {
+                binFileData[targetOffset] = parseInt(hexVal, 16);
+            }
+        }
+
+        function stepHex(inputId, delta, type) {
+            if (!binFileData || offsets[type] === null) return;
+            let inputElem = document.getElementById(inputId);
+            if (!inputElem) return;
+
+            let currentDec = parseInt(inputElem.value || '00', 16);
+            let nextDec;
+
+            if (type === 'fontStyle' || type === 'shortsSwitch') {
+                const validRange = [0, 1, 2];
+                let idx = validRange.indexOf(currentDec);
+                idx = idx === -1 ? (delta > 0 ? 0 : 2) : (idx + delta + validRange.length) % validRange.length;
+                nextDec = validRange[idx];
+            } else if (type === 'chestSwitch') {
+                const validRange = [0, 1];
+                let idx = validRange.indexOf(currentDec);
+                idx = idx === -1 ? (delta > 0 ? 0 : 1) : (idx + delta + validRange.length) % validRange.length;
+                nextDec = validRange[idx];
+            } else {
+                nextDec = Math.max(0, Math.min(255, currentDec + delta));
+            }
+
+            inputElem.value = nextDec.toString(16).padStart(2, '0').toUpperCase();
+            onHexInputChange(type);
+        }
+
+        function saveBinFile() {
+            if (!binFileData || !binFilePath) {
+                alert("⚠️ ERROR: Buka file DATA.BIN lewat tombol OPEN.BIN dulu!");
+                return;
+            }
+
+            try {
+                const fs = require('fs');
+                fs.writeFileSync(binFilePath, Buffer.from(binFileData));
+                alert("✅ SUCCESS: File " + binFileName + " berhasil disimpan.");
+            } catch (err) {
+                alert("❌ FAIL: Gagal menyimpan file -> " + err.message);
+            }
+        }
+    </script>
+</body>
+</html>
